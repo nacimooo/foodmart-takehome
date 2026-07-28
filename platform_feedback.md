@@ -64,6 +64,7 @@ Some of this overlaps with my README notes but worth repeating in a platform con
 - For localization, strings are hardcoded in English right now. Lokalise or something similar would make sense for a real product.
 - For security, if we were doing actual payments I'd defer to something like Stripe rather than rolling our own.
 - For navigation routes, a small `Routes` object is fine for now.  I'd move it to a separate file and tighten the structure if the app got bigger.
+- I would also set up a github action and link that to an artifact builder to generate both DEMO and (once a week) PROD builds.
 
 Overall I enjoyed building this and Kotlin/Compose made a lot of the architecture feel natural.
 The layers paid off when I added use cases and tests without touching the UI much.
