@@ -82,14 +82,14 @@ private fun FoodListContent(
             TopAppBar(
                 title = { Text("Food Mart") },
                 actions = {
-                    IconButton(onClick = onCartClick) {
-                        BadgedBox(
-                            badge = {
-                                if (cartItemCount > 0) {
-                                    Badge { Text(cartItemCount.toString()) }
-                                }
-                            },
-                        ) {
+                    BadgedBox(
+                        badge = {
+                            if (cartItemCount > 0) {
+                                Badge { Text(cartItemCount.toString()) }
+                            }
+                        },
+                    ) {
+                        IconButton(onClick = onCartClick) {
                             Icon(
                                 imageVector = Icons.Filled.ShoppingCart,
                                 contentDescription = "Shopping cart",
