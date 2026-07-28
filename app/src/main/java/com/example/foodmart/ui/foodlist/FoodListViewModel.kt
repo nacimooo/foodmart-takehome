@@ -3,8 +3,10 @@ package com.example.foodmart.ui.foodlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodmart.domain.model.FoodItem
-import com.example.foodmart.domain.repository.CartRepository
-import com.example.foodmart.domain.repository.FoodRepository
+import com.example.foodmart.domain.usecase.AddToCartUseCase
+import com.example.foodmart.domain.usecase.GetCategoriesUseCase
+import com.example.foodmart.domain.usecase.GetFoodItemsUseCase
+import com.example.foodmart.domain.usecase.ObserveCartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
@@ -20,15 +22,16 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FoodListViewModel @Inject constructor(
-    private val foodRepository: FoodRepository,
-    private val cartRepository: CartRepository,
+    private val getFoodItems: GetFoodItemsUseCase,
+    private val getCategories: GetCategoriesUseCase,
+    private val addToCart: AddToCartUseCase,
+    observeCart: ObserveCartUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FoodListUiState())
     val uiState: StateFlow<FoodListUiState> = _uiState.asStateFlow()
 
-
-    val cartItemCount: StateFlow<Int> = cartRepository.items
+    val cartItemCount: StateFlow<Int> = observeCart()
         .map { items -> items.sumOf { it.quantity } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
@@ -41,8 +44,8 @@ class FoodListViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 coroutineScope {
-                    val itemsDeferred = async { foodRepository.getFoodItems() }
-                    val categoriesDeferred = async { foodRepository.getCategories() }
+                    val itemsDeferred = async { getFoodItems() }
+                    val categoriesDeferred = async { getCategories() }
                     val items = itemsDeferred.await()
                     val categories = categoriesDeferred.await()
                     _uiState.update {
@@ -62,7 +65,6 @@ class FoodListViewModel @Inject constructor(
 
     fun onSortOrderSelected(sortOrder: SortOrder) {
         _uiState.update {
-
             // Tapping the active sort clears it back to the default order.
             val newOrder = if (it.sortOrder == sortOrder) SortOrder.NONE else sortOrder
             it.copy(sortOrder = newOrder)
@@ -81,6 +83,6 @@ class FoodListViewModel @Inject constructor(
     }
 
     fun onAddToCart(item: FoodItem) {
-        cartRepository.add(item)
+        addToCart(item)
     }
 }
