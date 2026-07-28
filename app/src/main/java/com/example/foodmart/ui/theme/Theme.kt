@@ -40,8 +40,8 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun FoodMartTheme(
         darkTheme: Boolean = isSystemInDarkTheme(),
-        // Dynamic color is available on Android 12+
-        dynamicColor: Boolean = true,
+        // Off by default: keeps branding consistent across devices and makes previews render.
+        dynamicColor: Boolean = false,
         content: @Composable () -> Unit
 ) {
     val colorScheme = when {
