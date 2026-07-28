@@ -76,6 +76,7 @@ How I'd break this up if we were doing it in a sprint. Each ticket has what I'd 
 
 **Assumptions**
 - Remove = delete that item entirely, not decrement by 1 (could add that later)
+- cart doesn't need to survive restart for v1"
 
 ---
 
