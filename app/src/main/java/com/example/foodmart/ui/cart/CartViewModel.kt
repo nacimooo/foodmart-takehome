@@ -2,8 +2,9 @@ package com.example.foodmart.ui.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.foodmart.domain.repository.CartRepository
-import com.example.foodmart.domain.repository.PurchaseRepository
+import com.example.foodmart.domain.usecase.ObserveCartUseCase
+import com.example.foodmart.domain.usecase.PurchaseCartUseCase
+import com.example.foodmart.domain.usecase.RemoveFromCartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +17,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val cartRepository: CartRepository,
-    private val purchaseRepository: PurchaseRepository,
+    observeCart: ObserveCartUseCase,
+    private val removeFromCart: RemoveFromCartUseCase,
+    private val purchaseCart: PurchaseCartUseCase,
 ) : ViewModel() {
 
     private data class PurchaseState(
@@ -28,7 +30,7 @@ class CartViewModel @Inject constructor(
     private val purchaseState = MutableStateFlow(PurchaseState())
 
     val uiState: StateFlow<CartUiState> =
-        combine(cartRepository.items, purchaseState) { items, purchase ->
+        combine(observeCart(), purchaseState) { items, purchase ->
             CartUiState(
                 items = items,
                 isPurchasing = purchase.isPurchasing,
@@ -37,7 +39,7 @@ class CartViewModel @Inject constructor(
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CartUiState())
 
     fun onRemoveItem(foodItemUuid: String) {
-        cartRepository.remove(foodItemUuid)
+        removeFromCart(foodItemUuid)
     }
 
     fun onPurchase() {
@@ -47,9 +49,7 @@ class CartViewModel @Inject constructor(
         purchaseState.update { it.copy(isPurchasing = true) }
         viewModelScope.launch {
             try {
-                purchaseRepository.purchase(items)
-                // Only clear the cart once the purchase went through.
-                cartRepository.clear()
+                purchaseCart(items)
                 purchaseState.update {
                     it.copy(isPurchasing = false, userMessage = "Order placed successfully!")
                 }
