@@ -31,6 +31,17 @@ But I set all of that up from scratch for this one app.
 
 A shared `core:testing` module with the dispatcher rule, `foodItem()` builders, and a short note on when to mock vs test the real implementation would make the next feature faster to test.
 
+### Smoke Testing:
+In addition to the Unit Tests, Smoke Testing was also conducted with a series of requirements for validation.
+These tests included:
+* Adding an item
+* Viewing cart and checking out
+* Removing items from cart
+* Adding multiple of a single item
+* Filtering to only view certain categories
+* Paying for the order
+* Sorting based on lowest and highest price
+
 ## Fake APIs for unfinished backend work
 
 The purchase endpoint isn't live, so I used `FakePurchaseApi` behind an interface and swapped it in through Hilt.
